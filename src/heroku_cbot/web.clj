@@ -11,9 +11,18 @@
    :headers {"Content-Type" "text/plain"}
    :body "Hello from Heroku"})
 
+(defn verify []
+  {:status 200
+   :headers {"Content-Type" "text/plain"}
+   :body "Hello from me"})
+
 (defroutes app
   (GET "/" []
        (splash))
+  (GET "/subscriptions" [ & z]
+       (if (.equals "pantulu" (z "hub.verify_token"))
+       (str (z "hub.challenge"))
+       (str "")))
   (ANY "*" []
        (route/not-found (slurp (io/resource "404.html")))))
 
@@ -22,5 +31,6 @@
     (jetty/run-jetty (site #'app) {:port port :join? false})))
 
 ;; For interactive development:
-;; (.stop server)
-;; (def server (-main))
+(comment
+ (.stop server)
+ (def server (-main)))
