@@ -17,12 +17,14 @@
    :body "Hello from me"})
 
 (defroutes app
-  (GET "/" []
-       (splash))
+  (GET "/" [& z]
+      (do (println "/" z)
+       (splash)))
   (GET "/subscriptions" [ & z]
+       (do (println "/subscriptions" z)
        (if (.equals "pantulu" (z "hub.verify_token"))
        (str (z "hub.challenge"))
-       (str "")))
+       (str ""))))
   (ANY "*" []
        (route/not-found (slurp (io/resource "404.html")))))
 
