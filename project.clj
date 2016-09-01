@@ -1,5 +1,5 @@
-(defproject clojure-getting-started "1.0.0-SNAPSHOT"
-  :description "Demo Clojure web app"
+(defproject heroku-cbot "1.0.0-SNAPSHOT"
+  :description "web app"
   :url "http://clojure-getting-started.herokuapp.com"
   :license {:name "Eclipse Public License v1.0"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
@@ -10,5 +10,5 @@
   :min-lein-version "2.0.0"
   :plugins [[environ/environ.lein "0.3.1"]]
   :hooks [environ.leiningen.hooks]
-  :uberjar-name "clojure-getting-started-standalone.jar"
+  :uberjar-name "heroku-cbot.jar"
   :profiles {:production {:env {:production true}}})
