@@ -6,6 +6,7 @@
             [ring.adapter.jetty :as jetty]
             [environ.core :refer [env]]))
 
+
 (defn splash []
   {:status 200
    :headers {"Content-Type" "text/plain"}
@@ -22,10 +23,11 @@
        (splash)))
   (GET "/subscriptions" [ & z]
        (do (println "/subscriptions" z)
-       (if (.equals "pantulu" (z "hub.verify_token"))
+       (if (.equals (env :verify-token) (z "hub.verify_token"))
        (str (z "hub.challenge"))
        (str ""))))
-  (ANY "*" []
+  (ANY "*" [& z]
+       (do (println "ANY " z))
        (route/not-found (slurp (io/resource "404.html")))))
 
 (defn -main [& [port]]
