@@ -26,6 +26,11 @@
        (if (.equals (env :verify-token) (z "hub.verify_token"))
        (str (z "hub.challenge"))
        (str ""))))
+  (POST "/subscriptions" [ & z]
+       (do (println "post /subscriptions" z)
+       (if (.equals (env :verify-token) (z "hub.verify_token"))
+       (str (z "hub.challenge"))
+       (str ""))))
   (ANY "*" [& z]
        (do (println "ANY " z))
        (route/not-found (slurp (io/resource "404.html")))))
