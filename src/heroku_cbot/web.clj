@@ -39,8 +39,8 @@
        (let [b (slurp body)] 
          (println (str "post /subscriptions " b " parsed " (echo-msg b))
          "")))
-  (ANY "*" {params :params}
-       (do (println " matched ANY " params))
+  (ANY "*" [x :as p] 
+       (do (println " matched ANY " p ))
        (route/not-found (slurp (io/resource "404.html")))))
 
 (defn -main [& [port]]
