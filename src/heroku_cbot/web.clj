@@ -25,12 +25,18 @@
   "EAAEL25UeaS0BAECZANlljPUiMwfjsTOrjZAqLZBmwRMZB0ngdDGXkdpZAYIY4Eoieev9gwGULZCOkMggJ9MZAxE0kbTfpEpBWz8hwRWF6epwmAmNAKiLZAIwYZBgtqQNtLl6Li1ZAdohcW6i4nWHznaRh4ulpAAZCkCqBl8WsxlB90xIQZDZD")
 (defn read-msg
   [body]
+  (try
   (let [jp (-> (js/parse-string body true) :entry first :messaging)]
     (->> jp 
-      (remove (fn [k](or (-> k :read) (-> k :message :is_echo true?) (-> k :delivery))))
+      (remove (fn [k](or (-> k :read) (-> k :message :is_echo) (-> k :delivery))))
       (mapv (fn [k] {(-> k :sender :id) [ (-> k :message :text)] }))
-      (reduce  (partial merge-with into)))))
-
+      (reduce (partial merge-with into))))
+  (catch Exception e
+    (clojure.stacktrace/print-stack-trace e)
+    (println " err body " (js/parse-string body true))
+    {} 
+    )))
+(read-msg js1)
 (def send-url "https://graph.facebook.com/v2.6/me/messages?access_token=")
 (defn echo-msg
   [m]
@@ -72,7 +78,9 @@
           (str ""))))
   (POST "/subscriptions" [x :as p]
     (let [b (slurp (:body p))
-          re (-> b read-msg)
+          _ (println "remsg body " b)
+          re (read-msg b)
+          _ (println "remsg " re)
           resp (re echo-msg)]
       (println (str "post /subscriptions " b " parsed " re " \n " resp))
       ""))
