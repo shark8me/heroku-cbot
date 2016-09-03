@@ -12,14 +12,26 @@
 
 (def pgtok
   "EAAEL25UeaS0BAECZANlljPUiMwfjsTOrjZAqLZBmwRMZB0ngdDGXkdpZAYIY4Eoieev9gwGULZCOkMggJ9MZAxE0kbTfpEpBWz8hwRWF6epwmAmNAKiLZAIwYZBgtqQNtLl6Li1ZAdohcW6i4nWHznaRh4ulpAAZCkCqBl8WsxlB90xIQZDZD")
-(defn echo-msg
+(defn read-msg
   [body]
-  (-> (js/parse-string body true) :entry first :messaging first :message :text))
+  (let [k (-> (js/parse-string body true) :entry first :messaging first)]
+    {(-> k :sender :id) (-> k :message :text)}))
 
 (def send-url "https://graph.facebook.com/v2.6/me/messages?access_token=")
+(defn echo-msg 
+  [m]
+  (doseq [[k v] m]
+  (hc/post (str send-url pgtok)
+         {:body (js/generate-string {:recipient {:id k}
+                                     :message {:text v}})
+         :content-type :json})))
+
+;(-> js1 read-msg echo-msg)
+
+
 (comment (hc/post (str send-url pgtok)
-         {:body (js/generate-string {:recipient {:id "userid"}
-                                     :message {:text "hello"}
+         {:body (js/generate-string {:recipient {:id "979241748869838"}
+                                     :message {:text "hello123"}
                                      })
          :content-type :json}))
 
@@ -44,7 +56,8 @@
        (str ""))))
   (POST "/subscriptions" [x :as p] 
        (let [b (slurp (:body p))] 
-         (println (str "post /subscriptions " b " parsed " (echo-msg b)))
+         (println (str "post /subscriptions " b " parsed " (read-msg b)))
+          (-> b read-msg echo-msg)
          ""))
   (ANY "*" [x :as p] 
        (do (println " matched ANY " p ))
