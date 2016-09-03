@@ -29,7 +29,7 @@
       (do (println "/" z)
        (splash)))
   (GET "/subscriptions" [ & z]
-       (do (println "/subscriptions" z)
+       (do (println "/subscriptions" z " "(env :verify-token))
        (if (.equals (env :verify-token) (z "hub.verify_token"))
        (str (z "hub.challenge"))
        (str ""))))
