@@ -14,42 +14,40 @@
 
 (def jp (js/parse-string js2 true))
 (comment
-((-> jp  :entry first :messaging) 4)
-(->>  (-> jp  :entry first :messaging)
-      (remove (fn [k](or (-> k :read) (-> k :message :is_echo true?) (-> k :delivery))))
-      (mapv (fn [k] {(-> k :sender :id) [ (-> k :message :text)] }))
-      (reduce  (partial merge-with into))
-      ))
+  ((-> jp  :entry first :messaging) 4)
+  (->>  (-> jp  :entry first :messaging)
+        (remove (fn [k] (or (-> k :read) (-> k :message :is_echo true?) (-> k :delivery))))
+        (mapv (fn [k] {(-> k :sender :id) [(-> k :message :text)]}))
+        (reduce  (partial merge-with into))))
 
 (def pgtok
   "EAAEL25UeaS0BAECZANlljPUiMwfjsTOrjZAqLZBmwRMZB0ngdDGXkdpZAYIY4Eoieev9gwGULZCOkMggJ9MZAxE0kbTfpEpBWz8hwRWF6epwmAmNAKiLZAIwYZBgtqQNtLl6Li1ZAdohcW6i4nWHznaRh4ulpAAZCkCqBl8WsxlB90xIQZDZD")
 (defn read-msg
   [body]
   (try
-  (let [jp (-> (js/parse-string body true) :entry first :messaging)]
-    (->> jp 
-      (remove (fn [k](or (-> k :read) (-> k :message :is_echo) (-> k :delivery))))
-      (mapv (fn [k] {(-> k :sender :id) [ (-> k :message :text)] }))
-      (reduce (partial merge-with into))))
-  (catch Exception e
-    (clojure.stacktrace/print-stack-trace e)
-    (println " err body " (js/parse-string body true))
-    {} 
-    )))
+    (let [jp (-> (js/parse-string body true) :entry first :messaging)]
+      (->> jp
+           (remove (fn [k] (or (-> k :read) (-> k :message :is_echo) (-> k :delivery))))
+           (mapv (fn [k] {(-> k :sender :id) [(-> k :message :text)]}))
+           (reduce (partial merge-with into))))
+    (catch Exception e
+      (clojure.stacktrace/print-stack-trace e)
+      (println " err body " (js/parse-string body true))
+      {})))
 (read-msg js1)
 (def send-url "https://graph.facebook.com/v2.6/me/messages?access_token=")
 (defn echo-msg
   [m]
   (mapv (fn [[k v]]
           (mapv (fn [v1]
-          (let [jso (js/generate-string {:recipient {:id k}
-                                         :message {:text v1}})
-                resp (:status  (hc/post (str send-url pgtok)
-                         {:body jso
-                          :content-type :json}))]
-            (println "echomsg " jso)
-             (if (= 200 resp) :OK :ERR))) v)) m))
-
+                  (let [jso (js/generate-string {:recipient {:id k}
+                                                 :message {:text v1}})
+                        resp (:status  (hc/post (str send-url pgtok)
+                                                {:body jso
+                                                 :content-type :json}))]
+                    (println "echomsg " jso)
+                    (if (= 200 resp) :OK :ERR))) v)) m))
+(echo-msg {"979241748869838" ["988"]})
 ;(def g4  (-> js2 read-msg echo-msg))
 
 (comment (hc/post (str send-url pgtok)
@@ -81,7 +79,7 @@
           _ (println "remsg body " b)
           re (read-msg b)
           _ (println "remsg " re)
-          resp (re echo-msg)]
+          resp (echo-msg re)]
       (println (str "post /subscriptions " b " parsed " re " \n " resp))
       ""))
   (ANY "*" [x :as p]
