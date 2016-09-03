@@ -8,7 +8,7 @@
             [clj-http.client :as hc]
             [environ.core :refer [env]]))
 (def js1
-"{\"object\":\"page\",\"entry\":[{\"id\":\"168497013587504\",\"time\":\"1472831064518\",\"messaging\":[{\"sender\":{\"id\":\"979241748869838\"},\"recipient\":{\"id\":\"168497013587504\"},\"timestamp\":1472829317206,\"message\":{\"mid\":\"mid.1472829314305:d34a5b5612cbea5871\"   ,\"seq\":2,\"text\":\"hello\"}}]}]}") 
+  "{\"object\":\"page\",\"entry\":[{\"id\":\"168497013587504\",\"time\":\"1472831064518\",\"messaging\":[{\"sender\":{\"id\":\"979241748869838\"},\"recipient\":{\"id\":\"168497013587504\"},\"timestamp\":1472829317206,\"message\":{\"mid\":\"mid.1472829314305:d34a5b5612cbea5871\"   ,\"seq\":2,\"text\":\"hello\"}}]}]}")
 
 (def pgtok
   "EAAEL25UeaS0BAECZANlljPUiMwfjsTOrjZAqLZBmwRMZB0ngdDGXkdpZAYIY4Eoieev9gwGULZCOkMggJ9MZAxE0kbTfpEpBWz8hwRWF6epwmAmNAKiLZAIwYZBgtqQNtLl6Li1ZAdohcW6i4nWHznaRh4ulpAAZCkCqBl8WsxlB90xIQZDZD")
@@ -18,22 +18,22 @@
     {(-> k :sender :id) (-> k :message :text)}))
 
 (def send-url "https://graph.facebook.com/v2.6/me/messages?access_token=")
-(defn echo-msg 
+(defn echo-msg
   [m]
-  (doseq [[k v] m]
-  (hc/post (str send-url pgtok)
-         {:body (js/generate-string {:recipient {:id k}
-                                     :message {:text v}})
-         :content-type :json})))
+  (mapv (fn [[k v]]
+          (let [jso (js/generate-string {:recipient {:id k}
+                                         :message {:text v}})]
+            (hc/post (str send-url pgtok)
+                     {:body jso
+                      :content-type :json})
+            jso)) m))
 
 ;(-> js1 read-msg echo-msg)
 
-
 (comment (hc/post (str send-url pgtok)
-         {:body (js/generate-string {:recipient {:id "979241748869838"}
-                                     :message {:text "hello123"}
-                                     })
-         :content-type :json}))
+                  {:body (js/generate-string {:recipient {:id "979241748869838"}
+                                              :message {:text "hello123"}})
+                   :content-type :json}))
 
 (defn splash []
   {:status 200
@@ -47,21 +47,22 @@
 
 (defroutes app
   (GET "/" [& z]
-      (do (println "/" z)
-       (splash)))
-  (GET "/subscriptions" [ & z :as p]
-       (do (println "/subscriptions" z )
-       (if (.equals pgtok (z "hub.verify_token"))
-       (str (z "hub.challenge"))
-       (str ""))))
-  (POST "/subscriptions" [x :as p] 
-       (let [b (slurp (:body p))] 
-         (println (str "post /subscriptions " b " parsed " (read-msg b)))
-          (-> b read-msg echo-msg)
-         ""))
-  (ANY "*" [x :as p] 
-       (do (println " matched ANY " p ))
-       (route/not-found (slurp (io/resource "404.html")))))
+    (do (println "/" z)
+        (splash)))
+  (GET "/subscriptions" [& z :as p]
+    (do (println "/subscriptions" z)
+        (if (.equals pgtok (z "hub.verify_token"))
+          (str (z "hub.challenge"))
+          (str ""))))
+  (POST "/subscriptions" [x :as p]
+    (let [b (slurp (:body p))
+          re (-> b read-msg)
+          resp (re echo-msg)]
+      (println (str "post /subscriptions " b " parsed " re " \n " resp))
+      ""))
+  (ANY "*" [x :as p]
+    (do (println " matched ANY " p))
+    (route/not-found (slurp (io/resource "404.html")))))
 
 (defn -main [& [port]]
   (let [port (Integer. (or port (env :port) 5000))]
@@ -69,5 +70,5 @@
 
 ;; For interactive development:
 (comment
- (.stop server)
- (def server (-main)))
+  (.stop server)
+  (def server (-main)))
