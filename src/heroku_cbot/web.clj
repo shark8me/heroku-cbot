@@ -5,6 +5,7 @@
             [clojure.java.io :as io]
             [cheshire.core :as js]
             [ring.adapter.jetty :as jetty]
+            [clj-http.client :as hc]
             [environ.core :refer [env]]))
 (def js1
 "{\"object\":\"page\",\"entry\":[{\"id\":\"168497013587504\",\"time\":\"1472831064518\",\"messaging\":[{\"sender\":{\"id\":\"979241748869838\"},\"recipient\":{\"id\":\"168497013587504\"},\"timestamp\":1472829317206,\"message\":{\"mid\":\"mid.1472829314305:d34a5b5612cbea5871\"   ,\"seq\":2,\"text\":\"hello\"}}]}]}") 
@@ -15,6 +16,12 @@
   [body]
   (-> (js/parse-string body true) :entry first :messaging first :message :text))
 
+(def send-url "https://graph.facebook.com/v2.6/me/messages?access_token=")
+(comment (hc/post (str send-url pgtok)
+         {:body (js/generate-string {:recipient {:id "userid"}
+                                     :message {:text "hello"}
+                                     })
+         :content-type :json}))
 
 (defn splash []
   {:status 200
@@ -37,7 +44,7 @@
        (str ""))))
   (POST "/subscriptions" [x :as p] 
        (let [b (slurp (:body p))] 
-         (println (str "post /subscriptions " p " parsed " (echo-msg b)))
+         (println (str "post /subscriptions " b " parsed " (echo-msg b)))
          ""))
   (ANY "*" [x :as p] 
        (do (println " matched ANY " p ))

@@ -7,6 +7,7 @@
                  [compojure "1.4.0"]
                  [ring/ring-jetty-adapter "1.4.0"]
                  [cheshire "5.6.3"]
+                 [clj-http "2.2.0"]
                  [environ "1.1.0"]]
   ;:ring  {:handler hello-world.core/handler}
   :min-lein-version "2.0.0"
