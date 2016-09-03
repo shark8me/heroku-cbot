@@ -35,6 +35,12 @@
        (if (.equals pgtok (z "hub.verify_token"))
        (str (z "hub.challenge"))
        (str ""))))
+  
+  ;FB sends 2 messages, one post to /subscriptions, and another post to /?*=/subscriptions
+  (POST "/" [x :as p] 
+       (let [b (slurp (:body p))] 
+         (println (str "post / " p " parsed " (echo-msg b))
+         "")))
   (POST "/subscriptions" [x :as p] 
        (let [b (slurp (:body p))] 
          (println (str "post /subscriptions " p " parsed " (echo-msg b))
