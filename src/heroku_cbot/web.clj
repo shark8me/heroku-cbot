@@ -30,14 +30,14 @@
   (GET "/" [& z]
       (do (println "/" z)
        (splash)))
-  (GET "/subscriptions" [ & z]
+  (GET "/subscriptions" [ & z :as p]
        (do (println "/subscriptions" z )
        (if (.equals pgtok (z "hub.verify_token"))
        (str (z "hub.challenge"))
        (str ""))))
-  (POST "/subscriptions" {body :body} 
-       (let [b (slurp body)] 
-         (println (str "post /subscriptions " b " parsed " (echo-msg b))
+  (POST "/subscriptions" [x :as p] 
+       (let [b (slurp (:body p))] 
+         (println (str "post /subscriptions " p " parsed " (echo-msg b))
          "")))
   (ANY "*" [x :as p] 
        (do (println " matched ANY " p ))
