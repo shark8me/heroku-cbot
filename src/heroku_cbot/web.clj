@@ -34,8 +34,8 @@
        (str (z "hub.challenge"))
        (str ""))))
   (POST "/subscriptions" {body :body} 
-       (let [b (js/parse-string (slurp body))] 
-         (println (str "post /subscriptions " b " parsed " (echo-msg body))
+       (let [b (slurp body)] 
+         (println (str "post /subscriptions " b " parsed " (echo-msg b))
          "")))
   (ANY "*" []
        (do (println "ANY "))
