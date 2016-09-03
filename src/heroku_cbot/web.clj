@@ -35,21 +35,13 @@
        (if (.equals pgtok (z "hub.verify_token"))
        (str (z "hub.challenge"))
        (str ""))))
-  
-  ;FB sends 2 messages, one post to /subscriptions, and another post to /?*=/subscriptions
-  #_(POST "/" [x :as p] 
-       (let [b (slurp (:body p))] 
-         (println (str "post / " p " parsed " (echo-msg b)))
-         ""))
   (POST "/subscriptions" [x :as p] 
        (let [b (slurp (:body p))] 
          (println (str "post /subscriptions " p " parsed " (echo-msg b)))
          ""))
   (ANY "*" [x :as p] 
        (do (println " matched ANY " p ))
-       #_(route/not-found (slurp (io/resource "404.html")))
-       (println (str "post ANY " p ))
-         ""))
+       (route/not-found (slurp (io/resource "404.html")))))
 
 (defn -main [& [port]]
   (let [port (Integer. (or port (env :port) 5000))]
