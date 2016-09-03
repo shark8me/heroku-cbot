@@ -9,6 +9,8 @@
 (def js1
 "{\"object\":\"page\",\"entry\":[{\"id\":\"168497013587504\",\"time\":\"1472831064518\",\"messaging\":[{\"sender\":{\"id\":\"979241748869838\"},\"recipient\":{\"id\":\"168497013587504\"},\"timestamp\":1472829317206,\"message\":{\"mid\":\"mid.1472829314305:d34a5b5612cbea5871\"   ,\"seq\":2,\"text\":\"hello\"}}]}]}") 
 
+(def pgtok
+  "EAAEL25UeaS0BAECZANlljPUiMwfjsTOrjZAqLZBmwRMZB0ngdDGXkdpZAYIY4Eoieev9gwGULZCOkMggJ9MZAxE0kbTfpEpBWz8hwRWF6epwmAmNAKiLZAIwYZBgtqQNtLl6Li1ZAdohcW6i4nWHznaRh4ulpAAZCkCqBl8WsxlB90xIQZDZD")
 (defn echo-msg
   [body]
   (-> (js/parse-string body true) :entry first :messaging first :message :text))
@@ -30,7 +32,7 @@
        (splash)))
   (GET "/subscriptions" [ & z]
        (do (println "/subscriptions" z " "(env :verify-token))
-       (if (.equals (env :verify-token) (z "hub.verify_token"))
+       (if (.equals pgtok (z "hub.verify_token"))
        (str (z "hub.challenge"))
        (str ""))))
   (POST "/subscriptions" {body :body} 
