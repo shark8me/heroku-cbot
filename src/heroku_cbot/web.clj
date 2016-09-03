@@ -31,7 +31,7 @@
       (do (println "/" z)
        (splash)))
   (GET "/subscriptions" [ & z]
-       (do (println "/subscriptions" z " "(env :verify-token))
+       (do (println "/subscriptions" z )
        (if (.equals pgtok (z "hub.verify_token"))
        (str (z "hub.challenge"))
        (str ""))))
@@ -39,8 +39,8 @@
        (let [b (slurp body)] 
          (println (str "post /subscriptions " b " parsed " (echo-msg b))
          "")))
-  (ANY "*" []
-       (do (println "ANY "))
+  (ANY "*" {params :params}
+       (do (println " matched ANY " params))
        (route/not-found (slurp (io/resource "404.html")))))
 
 (defn -main [& [port]]
