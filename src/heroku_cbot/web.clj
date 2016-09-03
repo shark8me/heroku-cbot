@@ -3,8 +3,15 @@
             [compojure.handler :refer [site]]
             [compojure.route :as route]
             [clojure.java.io :as io]
+            [cheshire.core :as js]
             [ring.adapter.jetty :as jetty]
             [environ.core :refer [env]]))
+(def js1
+"{\"object\":\"page\",\"entry\":[{\"id\":\"168497013587504\",\"time\":\"1472831064518\",\"messaging\":[{\"sender\":{\"id\":\"979241748869838\"},\"recipient\":{\"id\":\"168497013587504\"},\"timestamp\":1472829317206,\"message\":{\"mid\":\"mid.1472829314305:d34a5b5612cbea5871\"   ,\"seq\":2,\"text\":\"hello\"}}]}]}") 
+
+(defn echo-msg
+  [body]
+  (-> (js/parse-string body true) :entry first :messaging first :message :text))
 
 
 (defn splash []
@@ -27,11 +34,11 @@
        (str (z "hub.challenge"))
        (str ""))))
   (POST "/subscriptions" {body :body} 
-       (let [b (slurp body)] 
-         (println (str "post /subscriptions " b )
-                  (str "pref " b))))
-  (ANY "*" [& z]
-       (do (println "ANY " z))
+       (let [b (js/parse-string (slurp body))] 
+         (println (str "post /subscriptions " b " parsed " (echo-msg body))
+         "")))
+  (ANY "*" []
+       (do (println "ANY "))
        (route/not-found (slurp (io/resource "404.html")))))
 
 (defn -main [& [port]]
