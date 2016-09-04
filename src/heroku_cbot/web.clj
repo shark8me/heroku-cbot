@@ -41,7 +41,7 @@
                                                  :content-type :json}))]
                     (println "echomsg " jso)
                     (if (= 200 resp) :OK :ERR))) v)) m))
-
+;(env :page-token)
 (defroutes app
   (GET "/" [& z :as p]
     (do (println "/" z)
@@ -54,6 +54,8 @@
           resp (echo-msg re)]
       (println (str "post /" b " parsed " re " \n " resp))
       ""))
+  (GET "/env" [& z :as p]
+       (str "resp " p " :: " (keys z) " kk :: " (mapv env (keys z))))
   (ANY "*" [x :as p]
     (do (println " matched ANY " p))
     (route/not-found (slurp (io/resource "404.html")))))
