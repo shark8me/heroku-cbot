@@ -14,4 +14,4 @@
   :plugins [[lein-environ "1.1.0"]]
   ;:hooks [environ.leiningen.hooks]
   :uberjar-name "heroku-cbot.jar"
-  :profiles {:production {:env {:production true}}})
+  :profiles {:production {:env {:production false}}})
