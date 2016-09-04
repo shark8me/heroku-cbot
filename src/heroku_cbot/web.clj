@@ -47,7 +47,7 @@
                                                  :content-type :json}))]
                     (println "echomsg " jso)
                     (if (= 200 resp) :OK :ERR))) v)) m))
-(echo-msg {"979241748869838" ["988"]})
+;(echo-msg {"979241748869838" ["988"]})
 ;(def g4  (-> js2 read-msg echo-msg))
 
 (comment (hc/post (str send-url pgtok)
@@ -55,26 +55,18 @@
                                               :message {:text "hello123"}})
                    :content-type :json}))
 
-(defn splash []
-  {:status 200
-   :headers {"Content-Type" "text/plain"}
-   :body "Hello from Heroku"})
-
-(defn verify []
-  {:status 200
-   :headers {"Content-Type" "text/plain"}
-   :body "Hello from me"})
-
 (defroutes app
-  (GET "/" [& z]
+  (GET "/" [& z :as p]
     (do (println "/" z)
-        (splash)))
-  (GET "/subscriptions" [& z :as p]
+        (if (.equals pgtok (z "hub.verify_token"))
+          (str (z "hub.challenge"))
+          (str ""))))
+  #_(GET "/subscriptions" [& z :as p]
     (do (println "/subscriptions" z)
         (if (.equals pgtok (z "hub.verify_token"))
           (str (z "hub.challenge"))
           (str ""))))
-  (POST "/subscriptions" [x :as p]
+  (POST "/" [x :as p]
     (let [b (slurp (:body p))
           _ (println "remsg body " b)
           re (read-msg b)
