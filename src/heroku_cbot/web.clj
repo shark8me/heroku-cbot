@@ -19,7 +19,7 @@
         (remove (fn [k] (or (-> k :read) (-> k :message :is_echo true?) (-> k :delivery))))
         (mapv (fn [k] {(-> k :sender :id) [(-> k :message :text)]}))
         (reduce  (partial merge-with into))))
-
+(def verify-token "pantulu")
 (def pgtok
   "EAAEL25UeaS0BAECZANlljPUiMwfjsTOrjZAqLZBmwRMZB0ngdDGXkdpZAYIY4Eoieev9gwGULZCOkMggJ9MZAxE0kbTfpEpBWz8hwRWF6epwmAmNAKiLZAIwYZBgtqQNtLl6Li1ZAdohcW6i4nWHznaRh4ulpAAZCkCqBl8WsxlB90xIQZDZD")
 (defn read-msg
@@ -34,7 +34,7 @@
       (clojure.stacktrace/print-stack-trace e)
       (println " err body " (js/parse-string body true))
       {})))
-(read-msg js1)
+;(read-msg js1)
 (def send-url "https://graph.facebook.com/v2.6/me/messages?access_token=")
 (defn echo-msg
   [m]
@@ -58,7 +58,7 @@
 (defroutes app
   (GET "/" [& z :as p]
     (do (println "/" z)
-        (if (.equals pgtok (z "hub.verify_token"))
+        (if (.equals verify-token (z "hub.verify_token"))
           (str (z "hub.challenge"))
           (str ""))))
   #_(GET "/subscriptions" [& z :as p]
