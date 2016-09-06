@@ -9,10 +9,9 @@
             [environ.core :refer [env]]))
 
 
-
+;;set these via the command line using
+;;heroku config:set verify-token=<your token>
 (def verify-token (env :verify-token))
-;(def verify-token "pantulu")
-;(def pgtok "EAAEL25UeaS0BAECZANlljPUiMwfjsTOrjZAqLZBmwRMZB0ngdDGXkdpZAYIY4Eoieev9gwGULZCOkMggJ9MZAxE0kbTfpEpBWz8hwRWF6epwmAmNAKiLZAIwYZBgtqQNtLl6Li1ZAdohcW6i4nWHznaRh4ulpAAZCkCqBl8WsxlB90xIQZDZD")
 (def page-token (env :page-token))
 
 (def send-url "https://graph.facebook.com/v2.6/me/messages?access_token=")

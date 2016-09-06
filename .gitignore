@@ -11,3 +11,4 @@ pom.xml
 /.nrepl-port
 .*.clj.swp
 *~
+profiles.clj
