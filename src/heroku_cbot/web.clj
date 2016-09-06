@@ -10,9 +10,11 @@
 
 
 
-(def verify-token "pantulu")
-(def pgtok
-  "EAAEL25UeaS0BAECZANlljPUiMwfjsTOrjZAqLZBmwRMZB0ngdDGXkdpZAYIY4Eoieev9gwGULZCOkMggJ9MZAxE0kbTfpEpBWz8hwRWF6epwmAmNAKiLZAIwYZBgtqQNtLl6Li1ZAdohcW6i4nWHznaRh4ulpAAZCkCqBl8WsxlB90xIQZDZD")
+(def verify-token (env :verify-token))
+;(def verify-token "pantulu")
+;(def pgtok "EAAEL25UeaS0BAECZANlljPUiMwfjsTOrjZAqLZBmwRMZB0ngdDGXkdpZAYIY4Eoieev9gwGULZCOkMggJ9MZAxE0kbTfpEpBWz8hwRWF6epwmAmNAKiLZAIwYZBgtqQNtLl6Li1ZAdohcW6i4nWHznaRh4ulpAAZCkCqBl8WsxlB90xIQZDZD")
+(def page-token (env :page-token))
+
 (def send-url "https://graph.facebook.com/v2.6/me/messages?access_token=")
 
 
@@ -36,12 +38,12 @@
           (mapv (fn [v1]
                   (let [jso (js/generate-string {:recipient {:id k}
                                                  :message {:text v1}})
-                        resp (:status  (hc/post (str send-url pgtok)
+                        resp (:status  (hc/post (str send-url page-token)
                                                 {:body jso
                                                  :content-type :json}))]
                     (println "echomsg " jso)
                     (if (= 200 resp) :OK :ERR))) v)) m))
-;(env :page-token)
+
 (defroutes app
   (GET "/" [& z :as p]
     (do (println "/" z)
